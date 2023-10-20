@@ -126,7 +126,7 @@ func NewMySQLClient(sqlC *SQLConfig, sshC *SSHConfig) (*SQLClient, error) {
 	db, err := gorm.Open(
 		sql.Open(dsn),
 		&gorm.Config{
-			Logger: logger.Default.LogMode(logger.Silent),
+			Logger: logger.Default.LogMode(logger.Info),
 			NamingStrategy: schema.NamingStrategy{
 				//TablePrefix:   "",
 				SingularTable: !sqlC.PluralityTable, // 关闭默认表名是复数的方式
