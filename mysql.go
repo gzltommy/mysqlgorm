@@ -61,13 +61,14 @@ func (sc *SSHConfig) dialWithKeyFile() (*ssh.Client, error) {
 }
 
 type SQLConfig struct {
-	Host        string `json:"host"`
-	User        string `json:"user"`
-	Port        int    `json:"port"`
-	Password    string `json:"password"`
-	Database    string `json:"database"`
-	MaxOpenConn int    `json:"max_open_conn"` // 默认 100
-	MaxIdleConn int    `json:"max_idle_conn"` // 默认 20
+	Host           string `json:"host"`
+	User           string `json:"user"`
+	Port           int    `json:"port"`
+	Password       string `json:"password"`
+	Database       string `json:"database"`
+	MaxOpenConn    int    `json:"max_open_conn"`   // 默认 100
+	MaxIdleConn    int    `json:"max_idle_conn"`   // 默认 20
+	PluralityTable bool   `json:"plurality_table"` // 默认 false 单数；true：复数
 }
 
 type SQLClient struct {
@@ -122,14 +123,13 @@ func NewMySQLClient(sqlC *SQLConfig, sshC *SSHConfig) (*SQLClient, error) {
 			return sshClient.Dial("tcp", addr)
 		})
 	}
-
 	db, err := gorm.Open(
 		sql.Open(dsn),
 		&gorm.Config{
 			Logger: logger.Default.LogMode(logger.Silent),
 			NamingStrategy: schema.NamingStrategy{
 				//TablePrefix:   "",
-				SingularTable: true, // 关闭默认表名是复数的方式
+				SingularTable: !sqlC.PluralityTable, // 关闭默认表名是复数的方式
 				//NameReplacer:  nil,
 				//NoLowerCase:   false,
 			},
