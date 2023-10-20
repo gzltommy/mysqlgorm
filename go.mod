@@ -1,4 +1,4 @@
-module mysqlgorm
+module github.com/gzltommy/mysqlgorm
 
 go 1.17
 
