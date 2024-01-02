@@ -24,29 +24,37 @@ type SSHKeyType = string
 type SSHConfig struct {
 	Host     string
 	User     string
-	Port     int
+	Port     string
 	KeyType  SSHKeyType
 	Password string
 	KeyFile  string
+	TimeOut  time.Duration
 }
 
 func (sc *SSHConfig) dialWithPassword() (*ssh.Client, error) {
-	address := fmt.Sprintf("%s:%d", sc.Host, sc.Port)
+	if sc.TimeOut == 0 {
+		sc.TimeOut = time.Second * 15
+	}
+
 	config := &ssh.ClientConfig{
 		User: sc.User,
 		Auth: []ssh.AuthMethod{
 			ssh.Password(sc.Password),
 		},
 		HostKeyCallback: ssh.InsecureIgnoreHostKey(),
+		Timeout:         sc.TimeOut,
 	}
-	return ssh.Dial("tcp", address, config)
+	return ssh.Dial("tcp", net.JoinHostPort(sc.Host, sc.Port), config)
 }
 
 func (sc *SSHConfig) dialWithKeyFile() (*ssh.Client, error) {
-	address := fmt.Sprintf("%s:%d", sc.Host, sc.Port)
+	if sc.TimeOut == 0 {
+		sc.TimeOut = time.Second * 15
+	}
 	config := &ssh.ClientConfig{
 		User:            sc.User,
 		HostKeyCallback: ssh.InsecureIgnoreHostKey(),
+		Timeout:         sc.TimeOut,
 	}
 	if k, err := os.ReadFile(sc.KeyFile); err != nil {
 		return nil, err
@@ -59,13 +67,13 @@ func (sc *SSHConfig) dialWithKeyFile() (*ssh.Client, error) {
 			ssh.PublicKeys(signer),
 		}
 	}
-	return ssh.Dial("tcp", address, config)
+	return ssh.Dial("tcp", net.JoinHostPort(sc.Host, sc.Port), config)
 }
 
 type SQLConfig struct {
 	Host           string `json:"host"`
 	User           string `json:"user"`
-	Port           int    `json:"port"`
+	Port           string `json:"port"`
 	Password       string `json:"password"`
 	Database       string `json:"database"`
 	MaxOpenConn    int    `json:"max_open_conn"`   // 默认 100
@@ -102,11 +110,11 @@ func NewMySQLClient(sqlC *SQLConfig, sshC *SSHConfig) (*SQLClient, error) {
 	)
 	if sshC == nil {
 		// 直接连接 SQLConfig 服务器
-		dsn = fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8&parseTime=True&loc=Local",
+		dsn = fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8&parseTime=True&loc=Local",
 			sqlC.User, sqlC.Password, sqlC.Host, sqlC.Port, sqlC.Database)
 	} else {
 		// 注意这里与上面的区别： 【tcp】 更换为【 mysql+ssh 】
-		dsn = fmt.Sprintf("%s:%s@mysql+ssh(%s:%d)/%s?charset=utf8&parseTime=True&loc=Local",
+		dsn = fmt.Sprintf("%s:%s@mysql+ssh(%s:%s)/%s?charset=utf8&parseTime=True&loc=Local",
 			sqlC.User, sqlC.Password, sqlC.Host, sqlC.Port, sqlC.Database)
 
 		switch sshC.KeyType {

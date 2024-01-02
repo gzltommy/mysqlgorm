@@ -13,13 +13,13 @@ func TestMysql(t *testing.T) {
 			Host:     "127.0.0.1",
 			User:     "metaverse",
 			Password: "123456",
-			Port:     3306,
+			Port:     "3306",
 			Database: "test",
 		},
 		&SSHConfig{
 			Host: "192.168.1.2",
 			User: "ubuntu",
-			Port: 22,
+			Port: "22",
 			//KeyFile: "~/.ssh/id_rsa",
 			KeyFile: "C:\\Users\\ww\\.ssh\\id_rsa",
 			KeyType: SSHKeyTypeKey, // PASSWORD or KEY
