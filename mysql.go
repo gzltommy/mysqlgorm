@@ -15,17 +15,19 @@ import (
 )
 
 const (
-	SshKeyTypeKey      = "KEY"
-	SSHKeyTypePassword = "PASSWORD"
+	SSHKeyTypeKey      SSHKeyType = "KEY"
+	SSHKeyTypePassword SSHKeyType = "PASSWORD"
 )
 
+type SSHKeyType = string
+
 type SSHConfig struct {
-	Host     string `json:"host"`
-	User     string `json:"user"`
-	Port     int    `json:"port"`
-	Type     string `json:"type"`
-	Password string `json:"password"`
-	KeyFile  string `json:"key"`
+	Host     string
+	User     string
+	Port     int
+	KeyType  SSHKeyType
+	Password string
+	KeyFile  string
 }
 
 func (sc *SSHConfig) dialWithPassword() (*ssh.Client, error) {
@@ -107,8 +109,8 @@ func NewMySQLClient(sqlC *SQLConfig, sshC *SSHConfig) (*SQLClient, error) {
 		dsn = fmt.Sprintf("%s:%s@mysql+ssh(%s:%d)/%s?charset=utf8&parseTime=True&loc=Local",
 			sqlC.User, sqlC.Password, sqlC.Host, sqlC.Port, sqlC.Database)
 
-		switch sshC.Type {
-		case SshKeyTypeKey:
+		switch sshC.KeyType {
+		case SSHKeyTypeKey:
 			sshClient, err = sshC.dialWithKeyFile()
 		case SSHKeyTypePassword:
 			sshClient, err = sshC.dialWithPassword()

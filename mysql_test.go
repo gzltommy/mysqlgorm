@@ -22,7 +22,7 @@ func TestMysql(t *testing.T) {
 			Port: 22,
 			//KeyFile: "~/.ssh/id_rsa",
 			KeyFile: "C:\\Users\\ww\\.ssh\\id_rsa",
-			Type:    SshKeyTypeKey, // PASSWORD or KEY
+			KeyType: SSHKeyTypeKey, // PASSWORD or KEY
 		},
 	)
 	if err != nil {
