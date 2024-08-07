@@ -14,18 +14,18 @@ import (
 	"time"
 )
 
-const (
-	SSHKeyTypeKey      SSHKeyType = "KEY"
-	SSHKeyTypePassword SSHKeyType = "PASSWORD"
-)
+type SshKeyType = string
 
-type SSHKeyType = string
+const (
+	SSHKeyTypeKey      SshKeyType = "KEY"
+	SSHKeyTypePassword SshKeyType = "PASSWORD"
+)
 
 type SSHConfig struct {
 	Host     string
 	User     string
 	Port     string
-	KeyType  SSHKeyType
+	KeyType  SshKeyType
 	Password string
 	KeyFile  string
 	TimeOut  time.Duration
@@ -168,6 +168,6 @@ func NewMySQLClient(sqlC *SQLConfig, sshC *SSHConfig) (*SQLClient, error) {
 	sqlDB.SetConnMaxLifetime(7200 * time.Second)
 	return &SQLClient{
 		db:        db,
-		sshClient: nil,
+		sshClient: sshClient,
 	}, nil
 }
