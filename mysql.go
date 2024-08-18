@@ -110,11 +110,11 @@ func NewMySQLClient(sqlC *SQLConfig, sshC *SSHConfig) (*SQLClient, error) {
 	)
 	if sshC == nil {
 		// 直接连接 SQLConfig 服务器
-		dsn = fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8&parseTime=True&loc=Local",
+		dsn = fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local",
 			sqlC.User, sqlC.Password, sqlC.Host, sqlC.Port, sqlC.Database)
 	} else {
 		// 注意这里与上面的区别： 【tcp】 更换为【 mysql+ssh 】
-		dsn = fmt.Sprintf("%s:%s@mysql+ssh(%s:%s)/%s?charset=utf8&parseTime=True&loc=Local",
+		dsn = fmt.Sprintf("%s:%s@mysql+ssh(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local",
 			sqlC.User, sqlC.Password, sqlC.Host, sqlC.Port, sqlC.Database)
 
 		switch sshC.KeyType {
